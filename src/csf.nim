@@ -1,23 +1,24 @@
 # This is just an example to get you started. A typical hybrid package
 # uses this file as the main entry point of the application.
 
-import tables, strutils, options, sequtils, strformat
+import tables, strutils, sequtils, strformat
 ## Domain, Variable, Constraint
 ## 
 ## 
 ## 
 
-
 type Constraint*[V, D] = object of RootObj
   variables*: seq[V]
+  satisfyFunc*: proc(constraint: Constraint[V,D], assignment: Table[V, D]): bool {.closure, gcsafe.}
 
 
-proc initContstaint*[V, D](vars: seq[V]) : Constraint[V,D] = 
-  result = Constraint[V,D](variables: vars)
+proc initConstraint*[V, D](vars: seq[V], satisfyFunc: proc(constraint: Constraint[V,D], assignment: Table[V, D]): bool ) : Constraint[V,D] = 
+  result = Constraint[V,D](variables: vars, satisfyFunc: satisfyFunc)
 
 
-func isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
-    result = true
+# proc isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
+#   echo "always called..."
+#   result = true
 
 type CSF*[V, D] = ref object 
   variables*: seq[V]
@@ -36,34 +37,35 @@ proc newCSF*[V,D](vars: seq[V]= @[], domains: Table[V, seq[D]]=initTable[V,seq[D
     if not domains.hasKey(v):
       raise newException(Exception, $v)
     else:
-      constraints.add(v, newSeq[Constraint[V,D]]())
+      constraints[v] = newSeq[Constraint[V,D]]()
   result.constraints = constraints
     
 
-method addConstraint*[V, D](this: CSF, constraint: Constraint[V, D]) : void =
+proc addConstraint*[V, D](this: CSF[V, D], constraint: Constraint[V, D]): void =
   for v in constraint.variables:
     if v notin this.variables:
       raise newException(Exception, &"variable {v} doesn't exist in variables list, but yet defined as constraint.")
     else:
       var theSeq = this.constraints[v]
-      echo &"oldSeq {theSeq}"
-      echo $constraint
-
+      # echo &"oldSeq {theSeq}"
+      echo $constraint & $(constraint is Constraint)
       theSeq.add(constraint)
-      echo &"newSeq {theSeq}"
+      # echo &"newSeq {theSeq}"
       this.constraints[v] = theSeq
 
 
 proc isConsistent*[V, D](this: CSF[V,D], v: V, assignment: Table[V, D]): bool = 
   for c in this.constraints.getOrDefault(v, @[]):
+    echo &"check consistent {c} in {assignment}"
     if not c.isSatisifiedWith(assignment):
+      echo &"{c} not satisfieid in {assignment}"
       return false
   return true
 
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D]
 
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D] = 
-  echo "here" & $assignment
+  # echo "here" & $assignment
   if assignment.len == this.variables.len:
     return assignment
   else:

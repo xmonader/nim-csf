@@ -4,23 +4,19 @@ import sequtils, tables, strformat
 
 when isMainModule:
 
-    
-    type MapColorConstraint[K,V] = object of Constraint[K,V]
-        r1*: string
-        r2*: string
+    proc isSatisifiedWith[V,D](this: Constraint[V,D], assignment: Table[V,D]): bool =
+        let r1 = this.variables[0]
+        let r2 = this.variables[1]
 
-    proc initMapColorConstraint[K,V](r1, r2: string): MapColorConstraint[K,V] =
-        
-        result = MapColorConstraint[K,V](r1:r1, r2:r2, variables: @[r1,r2])
-    
-    proc isSatisifiedWith[K,V](this: MapColorConstraint[K,V], assignment: Table[K, V]): bool =
-        echo &"this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
-        if this.r1 notin assignment:
+        echo &">>>>> this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
+        if r1 notin assignment:
             return true
-        if this.r2 notin assignment:
+        if r2 notin assignment:
             return false
-        return assignment[this.r1] != assignment[this.r2]
-        
+        return assignment[r1] != assignment[r2]
+
+    proc initMapColorConstraint[V,D](variables: seq[V]) : Constraint[V,D] = 
+        return initConstraint[V,D](variables:variables, satisfyFunc: isSatisifiedWith[V,D])
 
     let variables = @["Western Australia", "Northern Territory", "South Australia", "Queensland", "New South Wales", 
     "Victoria", "Tasmania"]
@@ -46,10 +42,10 @@ when isMainModule:
             ["Victoria", "Tasmania"], 
     ]
     for pair in neighborsPairs:
-        let constraint = initMapColorConstraint[string, string](pair[0], pair[1])
+        let constraint = initMapColorConstraint[string, string](variables= @[pair[0], pair[1]])
         csp.addConstraint(constraint)
 
 
 
     echo $csp.backtrack()
-    echo $csp.constraints
+    # echo $csp.constraints
