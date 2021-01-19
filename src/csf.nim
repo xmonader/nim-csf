@@ -8,12 +8,13 @@ import tables, strutils, options, sequtils, strformat
 ## 
 
 
-type Constraint*[V, D] = object of RootObj
+type Constraint*[V, D] = ref object of RootObj
   variables*: seq[V]
 
 
-proc initContstaint*[V, D](vars: seq[V]) : Constraint[V,D] = 
-  result = Constraint[V,D](variables: vars)
+proc newConstraint*[V, D](vars: seq[V]) : Constraint[V,D] = 
+  result = new Constraint[V,D]
+  result.variables = vars
 
 
 method isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
@@ -47,11 +48,11 @@ method addConstraint*[V, D](this: CSF, constraint: Constraint[V, D]) : void =
       raise newException(Exception, &"variable {v} doesn't exist in variables list, but yet defined as constraint.")
     else:
       var theSeq = this.constraints[v]
-      echo &"oldSeq {theSeq}"
-      echo $constraint
+      # echo &"oldSeq {theSeq}"
+      # echo $constraint
 
       theSeq.add(constraint)
-      echo &"newSeq {theSeq}"
+      # echo &"newSeq {theSeq}"
       this.constraints[v] = theSeq
 
 

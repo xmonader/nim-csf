@@ -5,7 +5,7 @@ import sequtils, tables, strformat
 when isMainModule:
 
     
-    type MapColorConstraint[K,V] = object of Constraint[K,V]
+    type MapColorConstraint[K,V] = ref object of Constraint[K,V]
         r1*: string
         r2*: string
 
@@ -14,11 +14,11 @@ when isMainModule:
         result = MapColorConstraint[K,V](r1:r1, r2:r2, variables: @[r1,r2])
     
     method isSatisifiedWith[K,V](this: MapColorConstraint[K,V], assignment: Table[K, V]): bool =
-        echo &"this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
+        # echo &"this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
         if this.r1 notin assignment:
             return true
         if this.r2 notin assignment:
-            return false
+            return true
         return assignment[this.r1] != assignment[this.r2]
         
 
@@ -52,4 +52,4 @@ when isMainModule:
 
 
     echo $csp.backtrack()
-    echo $csp.constraints
+    # echo $csp.constraints
