@@ -8,7 +8,7 @@ when isMainModule:
         let r1 = this.variables[0]
         let r2 = this.variables[1]
 
-        echo &">>>>> this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
+        echo &">>>>> r1 {r1}, r2 {r2} assignment {assignment}"
         if r1 notin assignment:
             return true
         if r2 notin assignment:
@@ -16,7 +16,7 @@ when isMainModule:
         return assignment[r1] != assignment[r2]
 
     proc initMapColorConstraint[V,D](variables: seq[V]) : Constraint[V,D] = 
-        return initConstraint[V,D](variables:variables, satisfyFunc: isSatisifiedWith[V,D])
+        return Constraint[V,D](variables:variables, satisfyFunc: isSatisifiedWith[V,D])
 
     let variables = @["Western Australia", "Northern Territory", "South Australia", "Queensland", "New South Wales", 
     "Victoria", "Tasmania"]
