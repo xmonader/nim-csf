@@ -13,7 +13,7 @@ when isMainModule:
         
         result = MapColorConstraint[K,V](r1:r1, r2:r2, variables: @[r1,r2])
     
-    proc isSatisifiedWith[K,V](this: MapColorConstraint[K,V], assignment: Table[K, V]): bool =
+    method isSatisifiedWith[K,V](this: MapColorConstraint[K,V], assignment: Table[K, V]): bool =
         echo &"this.r1 {this.r1}, this.r2 {this.r2} assignment {assignment}"
         if this.r1 notin assignment:
             return true
@@ -46,7 +46,7 @@ when isMainModule:
             ["Victoria", "Tasmania"], 
     ]
     for pair in neighborsPairs:
-        let constraint = initMapColorConstraint[string, string](pair[0], pair[1])
+        var constraint = initMapColorConstraint[string, string](pair[0], pair[1])
         csp.addConstraint(constraint)
 
 

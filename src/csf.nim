@@ -16,7 +16,8 @@ proc initContstaint*[V, D](vars: seq[V]) : Constraint[V,D] =
   result = Constraint[V,D](variables: vars)
 
 
-func isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
+method isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
+    echo "always called.."
     result = true
 
 type CSF*[V, D] = ref object 
