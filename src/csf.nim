@@ -48,7 +48,7 @@ proc addConstraint*[V, D](this: CSF[V, D], constraint: Constraint[V, D]): void =
     else:
       var theSeq = this.constraints[v]
       # echo &"oldSeq {theSeq}"
-      echo $constraint & $(constraint is Constraint)
+      # echo $constraint & $(constraint is Constraint)
       theSeq.add(constraint)
       # echo &"newSeq {theSeq}"
       this.constraints[v] = theSeq
@@ -56,28 +56,32 @@ proc addConstraint*[V, D](this: CSF[V, D], constraint: Constraint[V, D]): void =
 
 proc isConsistent*[V, D](this: CSF[V,D], v: V, assignment: Table[V, D]): bool = 
   for c in this.constraints.getOrDefault(v, @[]):
-    echo &"check consistent {c} in {assignment}"
+    # echo &"check consistent {c} in {assignment}"
     if not c.isSatisifiedWith(assignment):
-      echo &"{c} not satisfieid in {assignment}"
+      # echo &"{c} not satisfieid in {assignment}"
       return false
   return true
 
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D]
 
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D] = 
-  # echo "here" & $assignment
   if assignment.len == this.variables.len:
     return assignment
   else:
     let unassignedVars = this.variables.filterIt(not assignment.hasKey(it))
+    # echo "++++++++++Unassigned variables: " & $unassignedVars
     let firstUnassigned = unassignedVars[0] 
     let varDomains = this.domains.getOrDefault(firstUnassigned, @[])
+
     for dom in varDomains:
+      # echo "will assign " & firstUnassigned & " to " & dom
       var localAssignment = deepCopy(assignment)
-      echo "will assign " & firstUnassigned & " to " & dom
+      # echo &"Assignment is {assignment} and localassignment is {localAssignment}"
+
       localAssignment[firstUnassigned] = dom
+      # echo &"potential assignment: {localassignment}"
       if this.isConsistent(firstUnassigned, localAssignment):
-        echo &"{firstUnassigned} = {dom} is consistent in {localAssignment}"
+        # echo &"{firstUnassigned} = {dom} is consistent in {localAssignment}"
         let solution = this.backtrack(localAssignment)
         if solution.len > 0:
           return solution
