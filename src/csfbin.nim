@@ -28,8 +28,7 @@ when isMainModule:
 
     var domains = initTable[string, seq[string]]()
     for v in variables:
-        echo &"setting {v} to {domainVals}"
-
+        # echo &"setting {v} to {domainVals}"
         domains[v] = domainVals
     var csp = newCSF[string, string](variables, domains)
 

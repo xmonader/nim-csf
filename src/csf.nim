@@ -18,7 +18,6 @@ proc newConstraint*[V, D](vars: seq[V]) : Constraint[V,D] =
 
 
 method isSatisifiedWith*[V, D](constraint: Constraint[V,D], assignment: Table[V, D]) : bool = 
-    echo "always called.."
     result = true
 
 type CSF*[V, D] = ref object 
@@ -65,7 +64,6 @@ proc isConsistent*[V, D](this: CSF[V,D], v: V, assignment: Table[V, D]): bool =
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D]
 
 proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]()): Table[V,D] = 
-  echo "here" & $assignment
   if assignment.len == this.variables.len:
     return assignment
   else:
@@ -74,10 +72,10 @@ proc backtrack*[V, D](this: CSF[V,D], assignment: Table[V, D]= initTable[V,D]())
     let varDomains = this.domains.getOrDefault(firstUnassigned, @[])
     for dom in varDomains:
       var localAssignment = deepCopy(assignment)
-      echo "will assign " & firstUnassigned & " to " & dom
+      # echo "will assign " & firstUnassigned & " to " & dom
       localAssignment[firstUnassigned] = dom
       if this.isConsistent(firstUnassigned, localAssignment):
-        echo &"{firstUnassigned} = {dom} is consistent in {localAssignment}"
+        # echo &"{firstUnassigned} = {dom} is consistent in {localAssignment}"
         let solution = this.backtrack(localAssignment)
         if solution.len > 0:
           return solution
